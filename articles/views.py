@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from .forms import ArticleForm, CommentForm
-from .models import Article
+from .models import Article, Comment
 
 # Create your views here.
 def create(request): # 1. 빈 종이를 주는 과정 # 2. 데이터베이스에 저장하는 과정
@@ -28,11 +28,15 @@ def index(request):
 def detail(request, id):
     article = Article.objects.get(id = id)
     form = CommentForm()
+    comments = article.comment_set.all()
+    
 
     context = {
         'article': article,
         'form': form,
+        'comments': comments,
     }
+
     return render(request, 'detail.html', context)
 
 def update(request, id):
@@ -70,3 +74,8 @@ def comment_create(request, article_id):
             return redirect('articles:detail', id=article_id)
     else:
         return redirect('articles:index')
+
+def comment_delete(request, article_id, id):
+    comment = Comment.objects.get(id=id)
+    comment.delete()
+    return redirect('articles:detail', id = article_id)
